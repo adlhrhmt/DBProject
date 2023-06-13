@@ -13,19 +13,20 @@ if ($conn->connect_error) {
 }
 
 // Create the database
-$sql = "CREATE DATABASE IF NOT EXISTS megah";
-if ($conn->query($sql) === TRUE) {
+$database = "megah";
+$create_db_query = "CREATE DATABASE IF NOT EXISTS $database";
+if ($conn->query($create_db_query) === TRUE) {
     echo "Database created successfully.<br>";
 } else {
     echo "Error creating database: " . $conn->error;
 }
 
 // Select the database
-$conn->select_db("megah");
+$conn->select_db($database);
 
 // Create the table
 $create_table_query = "
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_name VARCHAR(255),
     product_code VARCHAR(255),
@@ -37,9 +38,11 @@ CREATE TABLE products (
     selling DECIMAL(10, 2),
     balance INT
 )";
-mysqli_query($conn, $create_table_query);
-echo "Table created successfully!" . PHP_EOL;
-
+if ($conn->query($create_table_query) === TRUE) {
+    echo "Table created successfully!<br>";
+} else {
+    echo "Error creating table: " . $conn->error;
+}
 // Insert the data
 $data = [
     ["ARISTON PENCIL CASE FBC100 RED BLACK BLUE", "9557109025065", "Product", "Pencil Case", null, "PCS", 3.00, 6.00, 4],
@@ -83,10 +86,26 @@ $data = [
     ["DIAMOND AIR FRESHNERS - VANILLA BOUQUET", "9555944000001", "Product", "Perfume", null, "UNIT", 7.50, 10.00, 4]
 ];
 
-$stmt = $pdo->prepare("INSERT INTO products (product_name, product_code, type, category, gst, uom, cost, selling, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$insert_query = "INSERT INTO products (product_name, product_code, type, category, gst, uom, cost, selling, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+$stmt = $conn->prepare($insert_query);
+$stmt->bind_param("ssssssddi", $productName, $productCode, $type, $category, $gst, $uom, $cost, $selling, $balance);
 
 foreach ($data as $row) {
-    $stmt->execute($row);
+    $productName = $row[0];
+    $productCode = $row[1];
+    $type = $row[2];
+    $category = $row[3];
+    $gst = $row[4];
+    $uom = $row[5];
+    $cost = $row[6];
+    $selling = $row[7];
+    $balance = $row[8];
+    $stmt->execute();
 }
 
-echo "Data inserted successfully!";
+echo "Data inserted successfully!<br>";
+
+// Close the statement and connection
+$stmt->close();
+$conn->close();
+?>
