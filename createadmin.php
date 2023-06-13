@@ -15,7 +15,7 @@ if ($conn->query($create_table_query) === TRUE) {
 }
 
 // Insert the first admin data
-$adminEmail = "haikalultraman12@gmail.com";
+$adminEmail = "haikalultraman1234@gmail.com";
 $adminPassword = "12345";
 
 $insert_query = "INSERT INTO admin (adminEmail, adminPassword) VALUES (?, ?)";
