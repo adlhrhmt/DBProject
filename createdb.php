@@ -1,16 +1,27 @@
 <?php
+// Database credentials
 $servername = "localhost";
 $username = "root";
 $password = "";
-$database = "megah";
 
 // Create a connection
-$conn = mysqli_connect($servername, $username, $password, $database);
+$conn = new mysqli($servername, $username, $password);
 
-// Check the connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Create the database
+$sql = "CREATE DATABASE IF NOT EXISTS megah";
+if ($conn->query($sql) === TRUE) {
+    echo "Database created successfully.<br>";
+} else {
+    echo "Error creating database: " . $conn->error;
+}
+
+// Select the database
+$conn->select_db("contact");
 
 // Create the table
 $create_table_query = "
