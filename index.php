@@ -16,55 +16,55 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
 
     <?php
+session_start();
 include "database/db.php";
 $show_error = false;
-$_SESSION['logged_out'];
 
-if ($_SESSION['logged_out'] == false) {
-    header("Location: index.php");
-} else if ($_SESSION['logged_out'] == true) {
-    if (isset($_POST['Login'])) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+if (isset($_SESSION['logged_out']) && !$_SESSION['logged_out']) {
+    header("Location: manageinventory.php");
+    exit();
+}
 
-        // Prepare and execute the SELECT query
-        $query = "SELECT * FROM admin WHERE adminEmail = ?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, "s", $email);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+if (isset($_POST['Login'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $storedPassword = $row['adminPassword'];
+    // Prepare and execute the SELECT query
+    $query = "SELECT * FROM admin WHERE adminEmail = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-            // Verify the password
-            if ($password === $storedPassword) {
-                $userArray = array(
-                    'uid' => $row['adminid'],
-                    'fullname' => $row['adminFullName'],
-                    'email' => $row['adminEmail'],
-                    'login' => true
-                );
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $storedPassword = $row['adminPassword'];
 
-                setcookie("user_data", json_encode($userArray));
+        // Verify the password
+        if ($password === $storedPassword) {
+            $userArray = array(
+                'uid' => $row['id'],
+                'email' => $row['adminEmail'],
+                'login' => true
+            );
 
-                $_SESSION["logged_out"] = false;
-                header("Location: manageinventory.php");
-                exit();
-            } else {
-                $show_error = true;
-            }
+            setcookie("user_data", json_encode($userArray));
+
+            $_SESSION["logged_out"] = false;
+            header("Location: manageinventory.php");
+            exit();
         } else {
             $show_error = true;
         }
+    } else {
+        $show_error = true;
+    }
 
-        mysqli_stmt_close($stmt);
-        mysqli_close($conn);
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
 
-        if ($show_error) {
-            echo '<script>alert("Wrong password!");</script>';
-        }
+    if ($show_error) {
+        $error_message = "Wrong email or password!";
     }
 }
 ?>
