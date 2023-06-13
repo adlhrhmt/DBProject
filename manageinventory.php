@@ -111,7 +111,7 @@
                                         <label for="type" class="col-form-label">Type:</label>
                                         <select class="form-control" name="type" id="type">
                                             <option value="" disabled selected>Click For Options</option>
-                                            <option value="PRODUCT">PRODUCT</option>
+                                            <option value="PRODUCT">Product</option>
                                         </select>
                                     </div>
 
