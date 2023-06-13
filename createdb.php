@@ -21,7 +21,7 @@ if ($conn->query($sql) === TRUE) {
 }
 
 // Select the database
-$conn->select_db("contact");
+$conn->select_db("megah");
 
 // Create the table
 $create_table_query = "
